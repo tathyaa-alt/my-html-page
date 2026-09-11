@@ -1,0 +1,234 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>CSM Gym QC Review — 8 NMB Tasks</title><style>
+:root{--bg:#f4f6f8;--card:#fff;--line:#d7dde5;--text:#1f2937;--muted:#5b6472}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.5}
+.wrap{max-width:1260px;margin:0 auto;padding:24px}.report-page{display:none}.report-page.active{display:block}
+.batch,.task-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:22px}
+h1{font-size:27px;margin:0 0 14px}h2{font-size:20px;line-height:1.32;margin:0 0 15px;overflow-wrap:anywhere}
+h3{font-size:18px;margin:27px 0 12px;padding-bottom:7px;border-bottom:1px solid #e5e7eb}h4{font-size:16px;margin:0 0 10px}
+.meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:12px 0 18px}
+.meta>div,.summary-grid>div{background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:10px}
+.summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:10px 0 18px}
+.badge{display:inline-block;border:1px solid #4b5563;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700}
+.major{background:#fee2e2}.moderate{background:#fef3c7}.minor{background:#e0f2fe}.pass{background:#dcfce7}.rework{background:#fef3c7}
+.issue{border:1px solid var(--line);border-left:5px solid #6b7280;border-radius:9px;padding:14px 16px;margin:14px 0}
+.issue-major{border-left-color:#991b1b}.issue-moderate{border-left-color:#92400e}.issue-minor{border-left-color:#075985}
+.location,.category{border:1px solid #c7d2fe;border-radius:7px;padding:8px 10px;margin:8px 0 12px;font-size:13px;overflow-wrap:anywhere}
+.location{background:#eef2ff}.category{background:#f8fafc;border-color:#e5e7eb;margin-bottom:6px}
+.label{font-weight:700;margin:11px 0 5px}.quote{background:#fafafa;border-left:4px solid #9ca3af;padding:9px 11px;margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere;font:12.5px/1.45 Consolas,Menlo,monospace}
+.sql{background:#111827;color:#f9fafb;border-radius:7px;padding:10px 11px;margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.45 Consolas,Menlo,monospace}
+.noissue{font-weight:700;margin:8px 0 12px}table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px}
+th,td{border:1px solid #d1d5db;padding:8px 9px;text-align:left;vertical-align:top}th{background:#f3f4f6}
+ul{margin:7px 0 10px 20px;padding:0}li{margin:4px 0}.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:18px}
+.nav .pages{display:inline-flex;gap:6px;margin-left:10px}.nav button{border:1px solid #9ca3af;background:#fff;border-radius:6px;padding:6px 9px;cursor:pointer}.nav button.current{font-weight:700;background:#eef2ff}.nav button:disabled{opacity:.45;cursor:default}.small{font-size:12.5px;color:var(--muted)}
+@media(max-width:800px){.wrap{padding:12px}.meta,.summary-grid{grid-template-columns:1fr 1fr}}
+@media print{.report-page{display:block!important;page-break-after:always}.nav{display:none}.wrap{max-width:none;padding:0}.task-card{page-break-inside:avoid}}
+</style></head><body><div class='wrap'>
+<section class='report-page active' id='p1'><div class="nav"><button class="prev" onclick="showPage(currentPage-1)">Previous</button><div><span class="page-status"></span><span class="pages"><button data-page="1" onclick="showPage(1)">1</button><button data-page="2" onclick="showPage(2)">2</button></span></div><button class="next" onclick="showPage(currentPage+1)">Next</button></div>
+<section class='batch'>
+<h1>CSM Gym — Full QC Review of 8 NMB Tasks</h1>
+<div class='summary-grid'>
+<div><strong>Tasks Reviewed</strong><br>8</div>
+<div><strong>PASS</strong><br>3</div>
+<div><strong>NEEDS REWORK</strong><br>5</div>
+<div><strong>Tasks with Major Issues</strong><br>5</div>
+<div><strong>Confirmed QC Issues</strong><br>5</div>
+</div>
+<p class='small'><strong>Basic-task rejects:</strong> 0. Every Golden has at least 8 tool calls. 
+<strong>Review scope:</strong> prompt, exact task-specific SM, Golden, verifier SQL/descriptions, grounding, newness/cardinality/invariance, tool/schema feasibility, and explicit Prompt ↔ SM, SM ↔ Verifier, Prompt ↔ Verifier, and SM ↔ SM checks.
+<strong>False-positive control:</strong> call-order / tool-order-only verifier limitations were intentionally not reported.</p>
+<h3>Confirmed Issue Themes</h3>
+<table><thead><tr><th>Theme</th><th>Tasks Affected</th></tr></thead><tbody>
+<tr><td>CREATE / newness not proven</td><td>2</td></tr>
+<tr><td>Prompt ↔ SM lifecycle conflict</td><td>1</td></tr>
+<tr><td>Fragile exact free-text verifier</td><td>1</td></tr>
+<tr><td>SM-required invariance under-checked</td><td>1</td></tr>
+</tbody></table>
+<h3>Task Verdicts</h3>
+<table><thead><tr><th>Task ID</th><th>Scenario</th><th>Golden Calls</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>task_20260911_112348_717_869b754a_74a9fee1</td><td>SCN‑203: Renew support contract, add entitlement, and open a case under the primary contact</td><td>9</td><td>PASS</td></tr><tr><td>task_20260911_112348_848_117ee8a4_0a523c0b</td><td>SimonLLC_Move_Product_From_Closed_NY_Branch</td><td>10</td><td>NEEDS REWORK</td></tr><tr><td>task_20260911_112349_035_c2bc12bf_5783f393</td><td>Support Coverage Validation &amp; Priority Realignment</td><td>12</td><td>NEEDS REWORK</td></tr><tr><td>task_20260911_112349_080_6a6c967c_b53bd418</td><td>Recreate Cancelled Case</td><td>10</td><td>NEEDS REWORK</td></tr><tr><td>task_20260911_112349_657_573ab13a_5f7c6c58</td><td>Critical Outage &amp; User Linking</td><td>14</td><td>PASS</td></tr><tr><td>task_20260911_112349_702_9fdca5e6_84a0e80e</td><td>Account-Wide Hardware Case Knowledge Synchronization</td><td>15</td><td>NEEDS REWORK</td></tr><tr><td>task_20260911_112349_751_3afd93a8_2be85242</td><td>Assigning case to new user as old user left the project.</td><td>8</td><td>PASS</td></tr><tr><td>task_20260911_112349_793_ba26cea9_69937aad</td><td>Update Case Management Roles and Assignment</td><td>9</td><td>NEEDS REWORK</td></tr>
+</tbody></table>
+</section>
+<article class="task-card">
+      <h2>Task task_20260911_112348_717_869b754a_74a9fee1: SCN‑203: Renew support contract, add entitlement, and open a case under the primary contact</h2>
+      <div class="meta">
+        <div><strong>Verdict</strong><br><span class='badge pass'>PASS</span></div>
+        <div><strong>Highest Severity</strong><br>None</div>
+        <div><strong>Total Issue Count</strong><br>0</div>
+        <div><strong>Golden Tool Calls</strong><br>9</div>
+      </div>
+      <h3>Basicness Gate</h3>
+      <p class="noissue">PASS — Golden has 9 tool calls. The direct-reject rule applies only below 4 calls.</p>
+      <h3>Selected Tools</h3>
+      <p class="noissue">No issue found — this task JSON has no separate selected_tools array; every Golden tool used exists in the supplied CSM tool registry.</p>
+      <h3>Scenario Relevance</h3><p class='noissue'>No issue found</p><h3>Prompt</h3><p class='noissue'>No standalone prompt issue found</p><h3>Cross-Component Alignment</h3><table><thead><tr><th>Check</th><th>Status</th><th>Finding</th></tr></thead><tbody><tr><td>Prompt ↔ SM</td><td>Aligned</td><td>The prompt’s phone/high/in_progress case, active 2027 support contract, premium entitlement, and named SLA are all allowed by the exact task SM.</td></tr><tr><td>SM ↔ Verifier</td><td>Aligned</td><td>The verifier suite checks the SM-grounded case/contact/product/SLA fields and the requested contract/entitlement state without adding a conflicting requirement.</td></tr><tr><td>Prompt ↔ Verifier</td><td>Aligned</td><td>All material requested outcomes are checked: contact reactivation, new contract, new entitlement, new case, and SLA linkage.</td></tr><tr><td>SM ↔ SM</td><td>Aligned</td><td>No material contradiction found in the exact task-specific SM.</td></tr></tbody></table><h3>Golden Trajectory</h3><p class='noissue'>No issue found</p><h3>Verifiers</h3><p class='noissue'>No issue found</p><h4>Verifier Coverage Table</h4><table><thead><tr><th>Prompt / Policy Requirement</th><th>Covered?</th><th>Verifier / Evidence</th></tr></thead><tbody><tr><td>Reactivate James Hill’s primary contact</td><td>Yes</td><td>Verifier 0</td></tr><tr><td>Create active 2027 support contract for 150,000</td><td>Yes</td><td>Verifier 1</td></tr><tr><td>Create active premium 24x7 entitlement, max 50 cases/month</td><td>Yes</td><td>Verifier 2</td></tr><tr><td>Create high-priority phone case in progress with exact description/product</td><td>Yes</td><td>Verifier 3</td></tr><tr><td>Attach SLA Response - High and start tracking in progress</td><td>Yes</td><td>Verifier 4</td></tr></tbody></table><h3>Grounding / Data Checks</h3><p class='noissue'>No issue found</p><h3>Other Issues</h3><p class='noissue'>No issue found</p><h3>Final Reviewer Summary</h3><ul><li>Verdict: PASS.</li><li>Golden has 9 tool calls, so the task clears the basicness gate.</li><li>Prompt, exact SM, Golden, and verifier suite are aligned.</li><li>No material SM-SM contradiction or verifier false-PASS/false-FAIL path found.</li></ul></article><article class="task-card">
+      <h2>Task task_20260911_112348_848_117ee8a4_0a523c0b: SimonLLC_Move_Product_From_Closed_NY_Branch</h2>
+      <div class="meta">
+        <div><strong>Verdict</strong><br><span class='badge rework'>NEEDS REWORK</span></div>
+        <div><strong>Highest Severity</strong><br>Major</div>
+        <div><strong>Total Issue Count</strong><br>1</div>
+        <div><strong>Golden Tool Calls</strong><br>10</div>
+      </div>
+      <h3>Basicness Gate</h3>
+      <p class="noissue">PASS — Golden has 10 tool calls. The direct-reject rule applies only below 4 calls.</p>
+      <h3>Selected Tools</h3>
+      <p class="noissue">No issue found — this task JSON has no separate selected_tools array; every Golden tool used exists in the supplied CSM tool registry.</p>
+      <h3>Scenario Relevance</h3><p class='noissue'>No issue found</p><h3>Prompt</h3><p class='noissue'>No standalone prompt issue found</p><h3>Cross-Component Alignment</h3><table><thead><tr><th>Check</th><th>Status</th><th>Finding</th></tr></thead><tbody><tr><td>Prompt ↔ SM</td><td>Aligned</td><td>The SM directly maps the requested ticket-like paper trail to a customer_case with channel=alert and the unnamed reporter to the account primary contact.</td></tr><tr><td>SM ↔ Verifier</td><td>Issue</td><td>The SM requires creation, while Verifier 2 proves only matching final state, not newness.</td></tr><tr><td>Prompt ↔ Verifier</td><td>Issue</td><td>The prompt asks to leave a new paper-trail record; the verifier can accept a repurposed pre-existing case.</td></tr><tr><td>SM ↔ SM</td><td>Aligned</td><td>No material internal contradiction found. Tool/call ordering was not treated as a QC issue.</td></tr></tbody></table><h3>Golden Trajectory</h3><p class='noissue'>No issue found</p><h3>Verifiers</h3>
+    <div class="issue issue-major">
+      <h4><span class="badge major">Major</span> — NEWNESS — the required paper-trail case creation is not proven</h4>
+      <div class="category"><strong>Category:</strong> Verifier Coverage / Newness</div>
+      <div class="location"><strong>Location:</strong> config.scenario_config.system_prompt line 35 + config.scenario_config.prompt + config.verifier_configs[2].sql_query</div>
+      <p class='label'>User Prompt — exact affected phrase:</p><div class='quote'>leave a ticket-like record in the system so there’s a paper trail</div><p class='label'>Exact SM — affected clause:</p><div class='quote'>When the user asks for a ticket-like paper-trail record in the system (especially via the alert channel), create a customer_case with channel = alert.</div><p class='label'>Verifier 3 — affected SQL predicates:</p><div class='sql'>WHERE account_id = 45
+  AND contact_id = 103
+  AND channel = &#x27;alert&#x27;
+  AND state = &#x27;new&#x27;
+  AND priority = &#x27;moderate&#x27;
+  AND installed_product_id = 250
+  AND product_id = 113
+  AND short_description = &#x27;Product: Asset P113-336951-9659, Issue: Site transition - Asset repositioned from Site A to Site B NY&#x27;;</div>
+      <p><strong>Issue:</strong> The SM explicitly requires a newly created customer_case, but the case verifier only checks that a row with the final values exists. It has no new-case guard such as a post-seed case_id or creation timestamp.</p>
+      <p><strong>Why it matters:</strong> Because update_case can change the same fields, an older case can be repurposed into the expected final shape and still satisfy the verifier. That does not prove the requested paper-trail case was created.</p>
+      <p><strong>Concrete false-PASS / false-FAIL example:</strong> Take an existing Simon LLC case, update it to the checked contact/channel/state/priority/product/installed-product/description values, then send the alert on that row. Verifiers 2 and 3 can pass without create_new_case ever producing a new record.</p>
+    </div><h4>Verifier Coverage Table</h4><table><thead><tr><th>Prompt / Policy Requirement</th><th>Covered?</th><th>Verifier / Evidence</th></tr></thead><tbody><tr><td>Deactivate Simon Llc Site A - New York</td><td>Yes</td><td>Verifier 0</td></tr><tr><td>Move serial P113-336951-9659 to Site B and set in_use</td><td>Yes</td><td>Verifier 1</td></tr><tr><td>Create a new alert-channel paper-trail case</td><td>Partial</td><td>Verifier 2 checks final fields but not newness</td></tr><tr><td>Alert the primary contact successfully</td><td>Yes</td><td>Verifier 3</td></tr><tr><td>Do not move the other repair asset</td><td>Yes</td><td>Verifier 4</td></tr></tbody></table><h3>Grounding / Data Checks</h3><p class='noissue'>No issue found</p><h3>Other Issues</h3><p class='noissue'>No issue found</p><h3>Final Reviewer Summary</h3><ul><li>Verdict: NEEDS REWORK.</li><li>The only confirmed issue is case-creation newness.</li><li>The previous call-order concern is intentionally not reported.</li><li>Prompt-SM mapping is otherwise coherent and the asset/notification checks are well targeted.</li></ul></article><article class="task-card">
+      <h2>Task task_20260911_112349_035_c2bc12bf_5783f393: Support Coverage Validation &amp; Priority Realignment</h2>
+      <div class="meta">
+        <div><strong>Verdict</strong><br><span class='badge rework'>NEEDS REWORK</span></div>
+        <div><strong>Highest Severity</strong><br>Major</div>
+        <div><strong>Total Issue Count</strong><br>1</div>
+        <div><strong>Golden Tool Calls</strong><br>12</div>
+      </div>
+      <h3>Basicness Gate</h3>
+      <p class="noissue">PASS — Golden has 12 tool calls. The direct-reject rule applies only below 4 calls.</p>
+      <h3>Selected Tools</h3>
+      <p class="noissue">No issue found — this task JSON has no separate selected_tools array; every Golden tool used exists in the supplied CSM tool registry.</p>
+      <h3>Scenario Relevance</h3><p class='noissue'>No issue found</p><h3>Prompt</h3>
+    <div class="issue issue-major">
+      <h4><span class="badge major">Major</span> — Prompt ↔ SM — requested pending → in_progress transition is not allowed by the exact SM</h4>
+      <div class="category"><strong>Category:</strong> Prompt-SM Misalignment / Golden / Verifier</div>
+      <div class="location"><strong>Location:</strong> config.scenario_config.prompt + config.scenario_config.system_prompt line 27 + config.manual_tool_executions[0,4] + config.verifier_configs[0].sql_query</div>
+      <p class='label'>User Prompt — exact affected phrase:</p><div class='quote'>For CS-0001127 ... shift the case into in progress</div><p class='label'>Golden lookup — affected pre-state:</p><div class='quote'>CS-0001127 → state = &#x27;pending&#x27;</div><p class='label'>Exact SM — affected transition clause:</p><div class='quote'>Change state (new → in_progress, in_progress → pending/resolved).</div><p class='label'>Golden mutation — affected call:</p><div class='quote'>update_case({&quot;state&quot;:&quot;in_progress&quot;,&quot;case_id&quot;:1127})</div><p class='label'>Verifier 0 — affected predicate:</p><div class='sql'>WHERE c.number = &#x27;CS-0001127&#x27;
+  AND c.state = &#x27;in_progress&#x27;;</div>
+      <p><strong>Issue:</strong> The task’s exact SM lists the allowed state changes it gives agents, but does not include pending → in_progress. The user prompt requires exactly that transition, and both Golden and verifier enforce it anyway.</p>
+      <p><strong>Why it matters:</strong> This makes the task internally inconsistent: following the prompt/Golden conflicts with the exact policy text used for this task.</p>
+      <p><strong>Concrete false-PASS / false-FAIL example:</strong> A policy-following model can refuse to change the pending case because pending → in_progress is not present in the SM transition rule, and then fail Verifier 0 for obeying the task’s own SM.</p>
+    </div><h3>Cross-Component Alignment</h3><table><thead><tr><th>Check</th><th>Status</th><th>Finding</th></tr></thead><tbody><tr><td>Prompt ↔ SM</td><td>Issue</td><td>CS-0001127 is pending, but the SM’s state-change clause lists new→in_progress and in_progress→pending/resolved, not pending→in_progress.</td></tr><tr><td>SM ↔ Verifier</td><td>Issue</td><td>Verifier 0 requires in_progress even though the exact SM does not authorize that transition from the observed pending pre-state.</td></tr><tr><td>Prompt ↔ Verifier</td><td>Aligned in isolation</td><td>Verifier 0 matches the user’s requested final state; the conflict comes from the SM.</td></tr><tr><td>SM ↔ SM</td><td>Aligned</td><td>No separate material contradiction found inside the SM itself.</td></tr></tbody></table><h3>Golden Trajectory</h3><p class='noissue'>No separate Golden-only issue. The Golden’s pending → in_progress write is already covered under the Prompt ↔ SM contradiction above.</p><h3>Verifiers</h3><p class='noissue'>No issue found</p><h4>Verifier Coverage Table</h4><table><thead><tr><th>Prompt / Policy Requirement</th><th>Covered?</th><th>Verifier / Evidence</th></tr></thead><tbody><tr><td>Move CS-0001127 to in_progress</td><td>Contradicted by SM</td><td>Verifier 0</td></tr><tr><td>Set CS-0000888 priority to high and state to resolved</td><td>Yes</td><td>Verifier 1</td></tr><tr><td>Notify both accounts’ primary contacts</td><td>Yes</td><td>Verifier 2</td></tr></tbody></table><h3>Grounding / Data Checks</h3><p class='noissue'>No issue found</p><h3>Other Issues</h3><p class='noissue'>No issue found</p><h3>Final Reviewer Summary</h3><ul><li>Verdict: NEEDS REWORK.</li><li>The CS-0001127 transition is inconsistent with this task’s exact SM.</li><li>Golden and Verifier 0 both enforce the conflicting transition.</li><li>The second case update and both primary-contact notifications are otherwise covered.</li></ul></article><article class="task-card">
+      <h2>Task task_20260911_112349_080_6a6c967c_b53bd418: Recreate Cancelled Case</h2>
+      <div class="meta">
+        <div><strong>Verdict</strong><br><span class='badge rework'>NEEDS REWORK</span></div>
+        <div><strong>Highest Severity</strong><br>Major</div>
+        <div><strong>Total Issue Count</strong><br>1</div>
+        <div><strong>Golden Tool Calls</strong><br>10</div>
+      </div>
+      <h3>Basicness Gate</h3>
+      <p class="noissue">PASS — Golden has 10 tool calls. The direct-reject rule applies only below 4 calls.</p>
+      <h3>Selected Tools</h3>
+      <p class="noissue">No issue found — this task JSON has no separate selected_tools array; every Golden tool used exists in the supplied CSM tool registry.</p>
+      <h3>Scenario Relevance</h3><p class='noissue'>No issue found</p><h3>Prompt</h3><p class='noissue'>No standalone prompt issue found</p><h3>Cross-Component Alignment</h3><table><thead><tr><th>Check</th><th>Status</th><th>Finding</th></tr></thead><tbody><tr><td>Prompt ↔ SM</td><td>Aligned</td><td>The requested escalation is a customer-request escalation; product/account integrity and assignee-group membership are compatible with the exact SM.</td></tr><tr><td>SM ↔ Verifier</td><td>Aligned on checked values</td><td>The checked escalation enum, product/account relation and membership are compatible with the SM.</td></tr><tr><td>Prompt ↔ Verifier</td><td>Issue</td><td>The prompt requires two new records; the suite checks final values but not newness.</td></tr><tr><td>SM ↔ SM</td><td>Aligned</td><td>No material internal contradiction found in the exact SM.</td></tr></tbody></table><h3>Golden Trajectory</h3><p class='noissue'>No issue found</p><h3>Verifiers</h3>
+    <div class="issue issue-major">
+      <h4><span class="badge major">Major</span> — NEWNESS — neither requested CREATE is proven</h4>
+      <div class="category"><strong>Category:</strong> Verifier Coverage / Newness</div>
+      <div class="location"><strong>Location:</strong> config.scenario_config.prompt + config.verifier_configs[0,2,3].sql_query + CSM tool schema update_case/update_installed_product_details</div>
+      <p class='label'>User Prompt — exact affected phrases:</p><div class='quote'>Please recreate the canceled case ... Also, make sure to create an installed use in product &#x27;P997-684894-6335-MNS&#x27; ... and link it to the case.</div><p class='label'>Verifier 0 — affected predicate:</p><div class='sql'>WHERE c.short_description = &#x27;Product: Managed Network Services, Issue: Service not working as expected - case recreation requested&#x27;
+  AND c.product_id = 185
+  AND c.channel = &#x27;email&#x27;
+  AND c.priority = &#x27;critical&#x27;
+  AND c.state = &#x27;new&#x27;
+  AND c.escalation = 1
+  AND c.escalation_reason = &#x27;customer_request&#x27;
+  AND c.contact_id = 25
+  AND c.account_id = 16
+  AND c.assigned_to = 13</div><p class='label'>Verifier 2 — affected predicate:</p><div class='sql'>WHERE ip.serial_number = &#x27;P997-684894-6335-MNS&#x27;
+  AND ip.product_id = 185
+  AND ip.account_id = 16
+  AND ip.location_id = 13
+  AND ip.status = &#x27;in_use&#x27;;</div><p class='label'>Tool-schema fact — affected capability:</p><div class='quote'>update_case can change account_id, contact_id, product_id, installed_product_id, channel, priority, state, short_description, escalation, escalation_reason, assignment_group_id and assigned_to; update_installed_product_details can change account_id, product_id, serial_number, status and location_id.</div>
+      <p><strong>Issue:</strong> The user asks for a recreated/new case and a newly created installed product. The verifiers check only the final shapes and linkage. They do not prove that either row was newly created.</p>
+      <p><strong>Why it matters:</strong> Both target shapes can be produced by mutating existing rows using available update capabilities.</p>
+      <p><strong>Concrete false-PASS / false-FAIL example:</strong> Repurpose an unrelated existing case into the expected recreated-case shape and repurpose an existing installed_product into serial P997-684894-6335-MNS, then link them. Verifiers 0, 2 and 3 can all pass without either requested CREATE.</p>
+    </div><h4>Verifier Coverage Table</h4><table><thead><tr><th>Prompt / Policy Requirement</th><th>Covered?</th><th>Verifier / Evidence</th></tr></thead><tbody><tr><td>Recreate the canceled case as a new case with same primary contact/priority</td><td>Partial</td><td>Verifier 0 checks values but not newness</td></tr><tr><td>Assign Jonathan Martinez to Case Assignment_2 and ensure membership</td><td>Yes</td><td>Verifiers 0–1</td></tr><tr><td>Escalate for customer_request with exact description</td><td>Yes</td><td>Verifier 0</td></tr><tr><td>Create new in-use installed product P997-684894-6335-MNS at User 13 - Mumbai</td><td>Partial</td><td>Verifier 2 checks values but not newness</td></tr><tr><td>Link the recreated case to that installed product</td><td>Yes</td><td>Verifier 3</td></tr><tr><td>Keep original canceled case canceled</td><td>Yes</td><td>Verifier 4</td></tr></tbody></table><h3>Grounding / Data Checks</h3><p class='noissue'>No issue found</p><h3>Other Issues</h3><p class='noissue'>No issue found</p><h3>Final Reviewer Summary</h3><ul><li>Verdict: NEEDS REWORK.</li><li>The suite does not prove creation of either the recreated case or the installed product.</li><li>All requested final fields and the original canceled-case state are otherwise covered.</li><li>No call-order-only finding is reported.</li></ul></article><article class="task-card">
+      <h2>Task task_20260911_112349_657_573ab13a_5f7c6c58: Critical Outage &amp; User Linking</h2>
+      <div class="meta">
+        <div><strong>Verdict</strong><br><span class='badge pass'>PASS</span></div>
+        <div><strong>Highest Severity</strong><br>None</div>
+        <div><strong>Total Issue Count</strong><br>0</div>
+        <div><strong>Golden Tool Calls</strong><br>14</div>
+      </div>
+      <h3>Basicness Gate</h3>
+      <p class="noissue">PASS — Golden has 14 tool calls. The direct-reject rule applies only below 4 calls.</p>
+      <h3>Selected Tools</h3>
+      <p class="noissue">No issue found — this task JSON has no separate selected_tools array; every Golden tool used exists in the supplied CSM tool registry.</p>
+      <h3>Scenario Relevance</h3><p class='noissue'>No issue found</p><h3>Prompt</h3><p class='noissue'>No standalone prompt issue found</p><h3>Cross-Component Alignment</h3><table><thead><tr><th>Check</th><th>Status</th><th>Finding</th></tr></thead><tbody><tr><td>Prompt ↔ SM</td><td>Aligned</td><td>The SM explicitly resolves a named Sydney facility by account installed products, maps critical→critical and website→web, and makes Joseph the case contact when he is put on the new ticket.</td></tr><tr><td>SM ↔ Verifier</td><td>Aligned</td><td>The suite checks Joseph’s active customer profile/contact relationship, the exact Sydney flash-array case, Joseph as contact, Allen remaining primary, and the existing flash ticket remaining in progress.</td></tr><tr><td>Prompt ↔ Verifier</td><td>Aligned</td><td>All material requested outcomes are graded; no notification is required because the prompt does not ask to send one.</td></tr><tr><td>SM ↔ SM</td><td>Aligned</td><td>No material internal contradiction found.</td></tr></tbody></table><h3>Golden Trajectory</h3><p class='noissue'>No issue found</p><h3>Verifiers</h3><p class='noissue'>No issue found</p><h4>Verifier Coverage Table</h4><table><thead><tr><th>Prompt / Policy Requirement</th><th>Covered?</th><th>Verifier / Evidence</th></tr></thead><tbody><tr><td>Confirm Joseph Johnson’s portal profile is active and create his Wonka contact if needed</td><td>Yes</td><td>Verifier 0</td></tr><tr><td>Create a new critical web case on the Sydney in-use flash array</td><td>Yes</td><td>Verifier 1</td></tr><tr><td>Put Joseph on that new case as contact</td><td>Yes</td><td>Verifier 2</td></tr><tr><td>Keep Allen Martin as the primary contact</td><td>Yes</td><td>Verifier 3</td></tr><tr><td>Do not reuse the older in-progress outage ticket</td><td>Yes</td><td>Verifier 4 + Verifier 1 new-case condition</td></tr></tbody></table><h3>Grounding / Data Checks</h3><p class='noissue'>No issue found</p><h3>Other Issues</h3><p class='noissue'>No issue found</p><h3>Final Reviewer Summary</h3><ul><li>Verdict: PASS.</li><li>Golden has 14 calls and follows the task-specific disambiguation rules for Sydney installed products.</li><li>Joseph is correctly treated as the new case contact, not an assignee.</li><li>No material verifier or cross-component misalignment found.</li></ul></article><div class="nav"><button class="prev" onclick="showPage(currentPage-1)">Previous</button><div><span class="page-status"></span><span class="pages"><button data-page="1" onclick="showPage(1)">1</button><button data-page="2" onclick="showPage(2)">2</button></span></div><button class="next" onclick="showPage(currentPage+1)">Next</button></div></section>
+<section class='report-page' id='p2'><div class="nav"><button class="prev" onclick="showPage(currentPage-1)">Previous</button><div><span class="page-status"></span><span class="pages"><button data-page="1" onclick="showPage(1)">1</button><button data-page="2" onclick="showPage(2)">2</button></span></div><button class="next" onclick="showPage(currentPage+1)">Next</button></div><article class="task-card">
+      <h2>Task task_20260911_112349_702_9fdca5e6_84a0e80e: Account-Wide Hardware Case Knowledge Synchronization</h2>
+      <div class="meta">
+        <div><strong>Verdict</strong><br><span class='badge rework'>NEEDS REWORK</span></div>
+        <div><strong>Highest Severity</strong><br>Major</div>
+        <div><strong>Total Issue Count</strong><br>1</div>
+        <div><strong>Golden Tool Calls</strong><br>15</div>
+      </div>
+      <h3>Basicness Gate</h3>
+      <p class="noissue">PASS — Golden has 15 tool calls. The direct-reject rule applies only below 4 calls.</p>
+      <h3>Selected Tools</h3>
+      <p class="noissue">No issue found — this task JSON has no separate selected_tools array; every Golden tool used exists in the supplied CSM tool registry.</p>
+      <h3>Scenario Relevance</h3><p class='noissue'>No issue found</p><h3>Prompt</h3><p class='noissue'>No standalone prompt issue found</p><h3>Cross-Component Alignment</h3><table><thead><tr><th>Check</th><th>Status</th><th>Finding</th></tr></thead><tbody><tr><td>Prompt ↔ SM</td><td>Aligned</td><td>Customer-facing maps to published/external; applied guidance on a stable product maps to used_as=resolution; email logging/handled and solution_proposal notification are explicitly defined.</td></tr><tr><td>SM ↔ Verifier</td><td>Issue</td><td>Verifier 0 adds exact body equality that the SM does not require.</td></tr><tr><td>Prompt ↔ Verifier</td><td>Issue</td><td>The prompt does not dictate the body verbatim; Verifier 0 does.</td></tr><tr><td>SM ↔ SM</td><td>Aligned</td><td>No material internal contradiction found. The SM contains an ordering instruction, but ordering-only verifier concerns are intentionally excluded from QC.</td></tr></tbody></table><h3>Golden Trajectory</h3><p class='noissue'>No issue found</p><h3>Verifiers</h3>
+    <div class="issue issue-major">
+      <h4><span class="badge major">Major</span> — FRAGILE_VERIFIER — exact article body is a Golden-only wording requirement</h4>
+      <div class="category"><strong>Category:</strong> Fragile Verifier / Trajectory Preference</div>
+      <div class="location"><strong>Location:</strong> config.scenario_config.prompt + config.scenario_config.system_prompt → Knowledge + config.verifier_configs[0].sql_query</div>
+      <p class='label'>User Prompt — exact affected request:</p><div class='quote'>Please write a customer-facing article called &quot;Restore PA-3220 connection queue and restart monitoring service&quot; for that product and put me down as owner.</div><p class='label'>User Prompt — source facts for the body:</p><div class='quote'>They restored the connection queue and restarted the monitoring service mid-September, and the box has been stable since.</div><p class='label'>Exact SM — affected body rule:</p><div class='quote'>create_knowledge requires title, state, body, visibility, and owner.
+Do not prepend the title to the body.</div><p class='label'>Verifier 0 — over-strict predicate:</p><div class='sql'>AND body = &#x27;They restored the connection queue and restarted the monitoring service mid-September, and the box has been stable since.&#x27;</div>
+      <p><strong>Issue:</strong> The prompt fixes the article title, product, audience and owner, and supplies facts to write about, but it does not require one exact body sentence. The SM also does not prescribe that exact wording.</p>
+      <p><strong>Why it matters:</strong> A correct customer-facing article that faithfully states the same supplied facts in different wording would fail Verifier 0 solely because it does not copy the Golden body verbatim.</p>
+      <p><strong>Concrete false-PASS / false-FAIL example:</strong> Body: &#x27;The connection queue was restored and the monitoring service restarted in mid-September; the PA-3220 has remained stable since.&#x27; This is supported by the prompt and satisfies the SM, but the verifier fails.</p>
+    </div><h4>Verifier Coverage Table</h4><table><thead><tr><th>Prompt / Policy Requirement</th><th>Covered?</th><th>Verifier / Evidence</th></tr></thead><tbody><tr><td>Create the named PA-3220 customer-facing article, owned by Jose</td><td>Yes, but over-strict body</td><td>Verifier 0</td></tr><tr><td>Link new article as resolution to CS-0000005 and the already-resolved sibling</td><td>Yes</td><td>Verifier 1</td></tr><tr><td>Log the dealt-with email on CS-0000005</td><td>Yes</td><td>Verifier 2</td></tr><tr><td>Resolve CS-0000005 and notify its customer with the article</td><td>Yes</td><td>Verifiers 3–4</td></tr><tr><td>Close the resolved sibling case</td><td>Yes</td><td>Verifier 4</td></tr><tr><td>Leave new/closed/canceled sibling work and old retired write-up alone</td><td>Yes</td><td>Verifiers 4–5</td></tr></tbody></table><h3>Grounding / Data Checks</h3><p class='noissue'>No issue found</p><h3>Other Issues</h3><p class='noissue'>No issue found</p><h3>Final Reviewer Summary</h3><ul><li>Verdict: NEEDS REWORK.</li><li>The task is executable and broadly well covered.</li><li>Verifier 0 rejects valid paraphrases by forcing the Golden’s exact article body.</li><li>No call-order-only finding is reported.</li></ul></article><article class="task-card">
+      <h2>Task task_20260911_112349_751_3afd93a8_2be85242: Assigning case to new user as old user left the project.</h2>
+      <div class="meta">
+        <div><strong>Verdict</strong><br><span class='badge pass'>PASS</span></div>
+        <div><strong>Highest Severity</strong><br>None</div>
+        <div><strong>Total Issue Count</strong><br>0</div>
+        <div><strong>Golden Tool Calls</strong><br>8</div>
+      </div>
+      <h3>Basicness Gate</h3>
+      <p class="noissue">PASS — Golden has 8 tool calls. The direct-reject rule applies only below 4 calls.</p>
+      <h3>Selected Tools</h3>
+      <p class="noissue">No issue found — this task JSON has no separate selected_tools array; every Golden tool used exists in the supplied CSM tool registry.</p>
+      <h3>Scenario Relevance</h3><p class='noissue'>No issue found</p><h3>Prompt</h3><p class='noissue'>No standalone prompt issue found</p><h3>Cross-Component Alignment</h3><table><thead><tr><th>Check</th><th>Status</th><th>Finding</th></tr></thead><tbody><tr><td>Prompt ↔ SM</td><td>Aligned</td><td>The exact SM requires an assigned user to be active agent/manager and, when a group is set, a member of that group. The prompt explicitly asks Stephanie to be placed in CSM Tier 1 Support and removed from all other groups.</td></tr><tr><td>SM ↔ Verifier</td><td>Aligned</td><td>Verifier 1 checks Stephanie is active and agent/manager on the target group; Verifiers 0 and 2 enforce the requested membership set.</td></tr><tr><td>Prompt ↔ Verifier</td><td>Aligned</td><td>The case assignment, target membership and removal of all other memberships are directly checked.</td></tr><tr><td>SM ↔ SM</td><td>Aligned</td><td>No material internal contradiction found.</td></tr></tbody></table><h3>Golden Trajectory</h3><p class='noissue'>No issue found</p><h3>Verifiers</h3><p class='noissue'>No issue found</p><h4>Verifier Coverage Table</h4><table><thead><tr><th>Prompt / Policy Requirement</th><th>Covered?</th><th>Verifier / Evidence</th></tr></thead><tbody><tr><td>Add Stephanie Todd to CSM Tier 1 Support</td><td>Yes</td><td>Verifier 0</td></tr><tr><td>Assign CS-0000001 to Stephanie on CSM Tier 1 Support</td><td>Yes</td><td>Verifier 1</td></tr><tr><td>Ensure Stephanie has no other group memberships</td><td>Yes</td><td>Verifier 2</td></tr></tbody></table><h3>Grounding / Data Checks</h3><p class='noissue'>No issue found</p><h3>Other Issues</h3><p class='noissue'>No issue found</p><h3>Final Reviewer Summary</h3><ul><li>Verdict: PASS.</li><li>Golden has 8 calls and validates Stephanie, the target group, current memberships, and the case before mutation.</li><li>The verifier suite directly covers the requested final membership set and assignment.</li><li>No material cross-component or SM-SM issue found.</li></ul></article><article class="task-card">
+      <h2>Task task_20260911_112349_793_ba26cea9_69937aad: Update Case Management Roles and Assignment</h2>
+      <div class="meta">
+        <div><strong>Verdict</strong><br><span class='badge rework'>NEEDS REWORK</span></div>
+        <div><strong>Highest Severity</strong><br>Major</div>
+        <div><strong>Total Issue Count</strong><br>1</div>
+        <div><strong>Golden Tool Calls</strong><br>9</div>
+      </div>
+      <h3>Basicness Gate</h3>
+      <p class="noissue">PASS — Golden has 9 tool calls. The direct-reject rule applies only below 4 calls.</p>
+      <h3>Selected Tools</h3>
+      <p class="noissue">No issue found — this task JSON has no separate selected_tools array; every Golden tool used exists in the supplied CSM tool registry.</p>
+      <h3>Scenario Relevance</h3><p class='noissue'>No issue found</p><h3>Prompt</h3><p class='noissue'>No standalone prompt issue found</p><h3>Cross-Component Alignment</h3><table><thead><tr><th>Check</th><th>Status</th><th>Finding</th></tr></thead><tbody><tr><td>Prompt ↔ SM</td><td>Aligned</td><td>The requested manager role changes and user-group memberships are explicit; the case group itself is not requested to change, matching the SM’s preserve-unless-asked rule.</td></tr><tr><td>SM ↔ Verifier</td><td>Issue</td><td>Verifier 4 omits the SM-required preservation of the case’s existing assignment_group_id.</td></tr><tr><td>Prompt ↔ Verifier</td><td>Aligned on explicit user asks</td><td>Roles, user-group memberships and Mckenzie assignment are checked.</td></tr><tr><td>SM ↔ SM</td><td>Aligned</td><td>No material internal contradiction found in the exact SM.</td></tr></tbody></table><h3>Golden Trajectory</h3><p class='noissue'>No issue found</p><h3>Verifiers</h3>
+    <div class="issue issue-major">
+      <h4><span class="badge major">Major</span> — UNDER_CHECK — the case assignment group can be changed even though the SM forbids it</h4>
+      <div class="category"><strong>Category:</strong> SM-Verifier Misalignment / Invariance</div>
+      <div class="location"><strong>Location:</strong> config.scenario_config.prompt + config.scenario_config.system_prompt line 68 + config.manual_tool_executions[7,8] + config.verifier_configs[4].sql_query</div>
+      <p class='label'>User Prompt — exact affected scope:</p><div class='quote'>add both users to the Case Assignment group, and immediately assign the critical pending case ... to Mckenzie Mendez</div><p class='label'>Golden case lookup — affected pre-state:</p><div class='quote'>case_id = 1229, assignment_group_id = 2, assigned_to = 31</div><p class='label'>Exact SM — affected rule:</p><div class='quote'>Do not remove a user from other groups, deactivate anyone, or move the case to another group unless the user explicitly asks.</div><p class='label'>Golden update — affected call:</p><div class='quote'>update_case({&quot;case_id&quot;:1229,&quot;assigned_to&quot;:5})  // assignment_group_id remains 2</div><p class='label'>Verifier 4 — missing predicate:</p><div class='sql'>WHERE short_description = &#x27;Product: Managed Network Services Variant 5, Issue: is not working as expected.&#x27;
+  AND state = &#x27;pending&#x27;
+  AND priority = &#x27;critical&#x27;
+  AND assigned_to = 5;</div>
+      <p><strong>Issue:</strong> The prompt asks to add the two users to the Case Assignment user group, but it does not ask to move the target case into that group. The exact SM explicitly says not to move the case to another group unless asked. Golden preserves assignment_group_id=2, but Verifier 4 does not.</p>
+      <p><strong>Why it matters:</strong> A model can change the case’s assignment_group_id to 4 while assigning Mckenzie and still pass every verifier, even though that violates the SM’s explicit no-unrequested-group-move rule.</p>
+      <p><strong>Concrete false-PASS / false-FAIL example:</strong> Set case 1229 assigned_to=5 and assignment_group_id=4. Role and membership verifiers still pass, and Verifier 4 still passes because it never checks assignment_group_id.</p>
+    </div><h4>Verifier Coverage Table</h4><table><thead><tr><th>Prompt / Policy Requirement</th><th>Covered?</th><th>Verifier / Evidence</th></tr></thead><tbody><tr><td>Set Mckenzie Mendez role to manager</td><td>Yes</td><td>Verifier 0</td></tr><tr><td>Set Stephanie Todd role to manager</td><td>Yes</td><td>Verifier 1</td></tr><tr><td>Add Mckenzie to Case Assignment group</td><td>Yes</td><td>Verifier 2</td></tr><tr><td>Add Stephanie to Case Assignment group</td><td>Yes</td><td>Verifier 3</td></tr><tr><td>Assign the exact critical pending case to Mckenzie</td><td>Yes</td><td>Verifier 4</td></tr><tr><td>Do not move the case to another assignment group unless explicitly asked</td><td>No</td><td>Verifier 4 omits assignment_group_id</td></tr></tbody></table><h3>Grounding / Data Checks</h3><p class='noissue'>No issue found</p><h3>Other Issues</h3><p class='noissue'>No issue found</p><h3>Final Reviewer Summary</h3><ul><li>Verdict: NEEDS REWORK.</li><li>The explicit role, membership and assignee outcomes are covered.</li><li>The suite does not protect the SM-required case-group invariance.</li><li>A concrete false-PASS exists by moving case 1229 to group 4.</li></ul></article><div class="nav"><button class="prev" onclick="showPage(currentPage-1)">Previous</button><div><span class="page-status"></span><span class="pages"><button data-page="1" onclick="showPage(1)">1</button><button data-page="2" onclick="showPage(2)">2</button></span></div><button class="next" onclick="showPage(currentPage+1)">Next</button></div></section>
+<script>
+let currentPage=1;
+function showPage(n){
+ const pages=[...document.querySelectorAll('.report-page')];
+ if(n<1||n>pages.length)return;
+ currentPage=n;
+ pages.forEach((p,i)=>p.classList.toggle('active',i===n-1));
+ document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('current',Number(b.dataset.page)===n));
+ document.querySelectorAll('.prev').forEach(b=>b.disabled=n===1);
+ document.querySelectorAll('.next').forEach(b=>b.disabled=n===pages.length);
+ document.querySelectorAll('.page-status').forEach(s=>s.textContent=`Page ${n} of ${pages.length}`);
+ window.scrollTo({top:0,behavior:'instant'});
+}
+document.addEventListener('DOMContentLoaded',()=>showPage(1));
+</script></div></body></html>
